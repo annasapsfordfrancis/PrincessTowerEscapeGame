@@ -1,9 +1,20 @@
 # Princess Tower Escape
 
+![Screenshot of game level](screenshot.png)
+
+## Game download:
+https://perilouspixels.itch.io/princess-tower-escape
+
 ## Gameplay Video:
 https://www.youtube.com/watch?v=P22JCZOapfM
 
+## 3rd Party Assets
+* [Kenney 1-Bit Pack (tileset)](https://kenney.nl/assets/bit-pack)
+* [Kenney Mini Square (font)](https://kenney.nl/assets/kenney-fonts)
+
 ## Overview
+Completed as my CS50 Game Development final project.
+
 Princess Tower Escape is a turn-based hack-and-slash game about a princess escaping a tower. Navigate your way through three levels, evading and fighting guards with the spells and resources you pick up along the way.
 
 ## Aim of the game
@@ -56,9 +67,9 @@ A static camera with an audio listener.
 
 * Pause button -- pauses the game, which opens the pause menu. From here the player can resume the game, return to the start menu or quit the game.
 
-* Action Bar -- tracks items in player's inventory. Buttons can be clicked to use each item.
+* Action Bar -- tracks items in player's inventory. Buttons can be clicked to use each item. Tooltips giving more information appear over each ability on mouse hover.
 
-* Messages -- message boxes are displayed at the beginning of each level. When the player loses and when the player wins the game.
+* Messages -- message boxes are displayed at the beginning of each level, when the player loses and when the player wins the game.
 
 * PlayerSpawnPoint -- the location where the player is spawned.
 
@@ -69,11 +80,11 @@ A static camera with an audio listener.
 * ItemSpawners -- spawns an item in this location. There is a variable chance to spawn one of a range of items and a chance to spawn nothing at all.
 
 ## Game States
-* START -- initial state at the beginning of each level. Ends when message is dismissed.
+* START -- initial state at the beginning of each level. Ends when initial message is dismissed.
 
 * PLAYERTURN -- the player can move one square or use an action.
 
-* ENEMYTURN -- enemies can move one square or use an action.
+* ENEMYTURN -- enemies in turn can move one square or use an action.
 
 * PAUSE -- the game is paused. A message is displayed letting the player resume the game, return to the menu or quit. This can only occur during the player's turn or the enemies' turn.
 
@@ -99,17 +110,17 @@ I spent a lot of time tinkering with the enemy AI and there are still things I w
 ### TurnSystem
 (TurnSystem GameObject)
 
-#### Start
+#### Start()
 Sets the game state to start, displays the level beginning message and spawns the player at the player spawn location.
 
 #### RegisterEnemy(GameObject enemy)
 Adds enemy to a list of enemies in play. Called by the enemy spawners on each enemy.
 
 #### StartPlayerTurn()
-Calls the player manager StartTurn method. Called by the start button at the beginning of each level.
+Calls the player manager StartTurn() method. Called by the start button at the beginning of each level.
 
 #### EndPlayerTurn()
-Calls StartEnemyTurn. Called by the player manager.
+Calls StartEnemyTurn(). Called by the PlayerManager script.
 
 #### StartEnemyTurn()
 If there are enemies in play it changes the game state to ENEMYTURN and sets the current enemy to the first one in the EnemiesInPlay list.
@@ -174,7 +185,7 @@ If the player is further than the disengage distance the enemy will de-aggro and
 A placeholder method in case we want to perform any logic at the beginning of the enemy's turn.
 
 #### EndTurn()
-Calls the TurnSystem EndEnemyTurn().
+Calls the TurnSystem EndEnemyTurn() method.
 
 #### bool CheckCollision(Vector3 target)
 Checks whether there would be a collision if the enemy moved to that square.
@@ -195,32 +206,33 @@ This loops through the enemy's squad and aggros them by calling AggroSelf() on e
 This casts a ray between the enemy and the player's position and returns true if it doesn't collide with anything other than the player.
 
 #### MoveTowardsPosition(Vector2 a, Vector2 b)
-Logic to choose which tile the enemy will move to next when it is chasing the player. It does this by setting the Vector3 movePosition variable.
+Logic to choose which tile the enemy will move to next when it is chasing the player. It does this by setting the Vector3 **movePosition** variable.
 
-xDistance and yDistance are floats that store the exact x and y distances between the enemy and the player.
+**xDistance** and **yDistance** are floats that store the exact x and y distances between the enemy and the player.
 
-newPositionX and newPositionY hold x and y positions that the enemy will move to. Because the player and enemies don't move diagonally only one of these can be set to a non-zero value.
+**newPositionX** and **newPositionY** hold x and y positions that the enemy will move to. Because the player and enemies don't move diagonally only one of these can be set to a non-zero value.
 
-left, right, up and down are Vector2 convenience variables set to the tile positions immediately to the left, right, above and below the enemy's current position.
+**left**, **right**, **up** and **down** are Vector2 convenience variables set to the tile positions immediately to the left, right, above and below the enemy's current position.
 
 The enemy tracks whether it can currently move left, right, up or down by calling CheckCollision(Vector3 target) on each one.
 
-If the player is to the left, right, up or down of the enemy and the enemy can go that way newPositionX and newPositionY are set to left, right, up or down.
+If the player is to the left, right, up or down of the enemy and the enemy can go that way **newPositionX** and **newPositionY** are set to **left**, **right**, **up** or **down**.
 
-If the player is directly up or down only newPositionY will be set.
+If the player is directly up or down only **newPositionY** will be set.
 
-If the player is directly left or right only newPosistionX will be set.
+If the player is directly left or right only **newPosistionX** will be set.
 
-If the player is up and left both newPositionY and newPositionX will be set.
+If the player is up and left both **newPositionY** and **newPositionX** will be set.
 
-If both newPositionX and newPositionY are set to a non-zero value we'll have to pick one of them later so the enemy doesn't move diagonally.
+If both **newPositionX** and **newPositionY** are set to a non-zero value we'll have to pick one of them later so the enemy doesn't move diagonally.
 
-If neither newPositionX or newPositionY were set because the way was blocked the enemy will try to move in a lateral direction (by setting movePosition to that direction).
+If neither **newPositionX** or **newPositionY** were set because the way was blocked the enemy will try to move in a lateral direction (by setting **movePosition** to that direction).
+
 If it can't move laterally it will end its turn.
 
-If only one of newPositionX or newPositionY were set the enemy will move in that direction (by setting movePosition to that direction).
+If only one of **newPositionX** or **newPositionY** were set the enemy will move in that direction (by setting **movePosition** to that direction).
 
-If both newPositionX and newPositionY are set it picks one at random and will move in that direction (by setting movePosition to that direction).
+If both **newPositionX** and **newPositionY** are set it picks one at random and will move in that direction (by setting **movePosition** to that direction).
 
 ---
 ### EnemyStats
@@ -296,7 +308,7 @@ Only functions while the game state is PLAYERTURN.
 
 If the player has moved one tile it ends the player's turn with EndTurn().
 
-If the player has started moving it continues animating the player sprite towards the movePosition with Vector3.MoveTowards.
+If the player has started moving it continues animating the player sprite towards the **movePosition** with Vector3.MoveTowards.
 
 If the player hasn't started moving it checks to see whether the horizontal or vertical direction keys have been pressed. The player can't move diagonally so if both horizontal and vertical keys are pressed horizontal will be preferred. If the direction keys have been pressed it calls HandleMovement(Vector3 newPosition) passing in the relevant location.
 
@@ -305,7 +317,7 @@ If the direction keys are pressed it uses up a player action by calling PlayerSt
 #### HandleMovement(Vector3 newPosition)
 Takes a Vector3 and checks it for colliders with GetCollision(Vector3 target, float radius, LayerMask collisionLayer).
 
-If there is no collider it sets the player's movePosition to newPosition. FixedUpdate() will then animate the player sprite moving to this tile.
+If there is no collider it sets the player's **movePosition** to **newPosition**. FixedUpdate() will then animate the player sprite moving to this tile.
 
 If there is an enemy in that location it calls HandleCombat(Transform target) and ends the player's turn.
 
@@ -324,7 +336,7 @@ Checks a location for any tile on the collision layer (walls and enemies).
 #### StartTurn()
 Called by TurnSystem.StartPlayerTurn().
 
-Resets player startPosition to the player's current position. Makes sure player isn't aiming. Calls PlayerStats.ReplenishActions() to set the player's remaining actions to their maximum. Updates the game state to PLAYERTURN.
+Resets player **startPosition** to the player's current position. Makes sure player isn't aiming. Calls PlayerStats.ReplenishActions() to set the player's remaining actions to their maximum. Updates the game state to PLAYERTURN.
 
 #### EndTurn()
 Called by FixedUpdate() if the player has moved one tile.
@@ -376,12 +388,13 @@ If the target is valid it checks the current active ability (crossbow, fireball 
 For crossbow the first collider in the RaycastHit2D array is passed to Inventory.FireCrossbow(Transform target).
 
 For fireball all locations in a 3x3 grid surrounding the location parameter are passed to GetEnemiesInLocationList(List<Vector3> locationList). If more than zero targets are returned they are passed to Inventory.CastFireball(List<Transform> targets).
+   
 For lightning all colliders in the RaycastHit2D array with the tag Enemy are passed to Inventory.CastLightning(List<Transform> targets).
 
 If the target is invalid a floating message with "no target" is displayed.
 
 #### List<Transform> GetEnemiesInLocationList(List<Vector3> locationList)
-Takes a list of Vector3 and returns a list of any enemies occupying those locations. Called by UseAbilityAtLocation(Vector3 location).
+Helper function for UseAbilityAtLocation(Vector3 location). Takes a list of Vector3 and returns a list of any enemies occupying those locations.
 
 #### bool PlayerCanUseItem()
 Returns true if the game state is PLAYERTURN and the player has actions remaining this turn. Called by the Inventory AimCrossbow(), AimFireball, AimLightning, UseShieldScroll() and UseHealthPotion() methods.
@@ -517,6 +530,7 @@ All four functions instantiate the relevant floating number/message prefab, set 
 (TargetSquare and TargetGrid GameObjects)
 
 Controls the behaviour of the ranged ability target square and target grid.
+   
 While the TargetSquare or TargetGrid game objects are active they follow the mouse and snap to the grid.
 
 There is a line renderer component attached to both game objects. On start both positions of the line are set to the player's location. On update the second position is updated to the position of the target square.
@@ -564,7 +578,7 @@ Generates a tooltip when the player hovers over the button.
 ### TooltipName and TooltipText
 (Tooltip GameObject)
 
-Populates the Tooltip prefab with the name and text specified in the script.
+Populates the Tooltip prefab with the name and text specified in the Tooltip script.
 
 ---
 ### HotKey
