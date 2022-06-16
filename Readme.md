@@ -2,7 +2,7 @@
 
 ![Screenshot of game level](screenshot.png)
 
-## Game download:
+## Game Download:
 https://perilouspixels.itch.io/princess-tower-escape
 
 ## Gameplay Video:
